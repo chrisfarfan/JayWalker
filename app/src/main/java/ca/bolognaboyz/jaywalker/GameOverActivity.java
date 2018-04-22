@@ -19,8 +19,8 @@ public class GameOverActivity extends Activity {
         gameOverTextView = findViewById(R.id.gameOverMsg);
         int playerScore = getIntent().getIntExtra("playerScore", 0);
 
-        gameOverTextView.setText("Game Over Man, Game Over! You had a score of " + playerScore +
-        ".What would you like to do?");
+        gameOverTextView.setText("Game Over Man, Game Over! \n\n You had a score of " + playerScore +
+        ". \n\n What would you like to do?");
     }
 
     public void mainMenuClick(View view){

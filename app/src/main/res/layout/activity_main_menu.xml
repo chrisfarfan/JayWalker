@@ -8,8 +8,8 @@
 
     <Button
         android:id="@+id/instructionsButton"
-        android:layout_width="133dp"
-        android:layout_height="52dp"
+        android:layout_width="158dp"
+        android:layout_height="75dp"
         android:layout_marginBottom="96dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -22,8 +22,8 @@
 
     <Button
         android:id="@+id/playButton"
-        android:layout_width="133dp"
-        android:layout_height="52dp"
+        android:layout_width="160dp"
+        android:layout_height="73dp"
         android:layout_marginBottom="36dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
