@@ -44,9 +44,13 @@ public class PlayActivity extends Activity {
     float popoX = 150;
     float popoY = 2960;
 
-    //Starting position of second column of cars
+    //Starting positions of second columns of cars
     float taxiX = 550;
-    float taxiY = -500;
+    float initialTaxiY[] = {0, 900, 2200};
+    float currentTaxiY[] ={2200, 900, -300};
+
+    int taxiLapCounter = 0;
+
 
     //Where the player tapped
     float touchX;
@@ -195,7 +199,10 @@ public class PlayActivity extends Activity {
 
                 gameCanvas.drawBitmap(player, playerX, playerY, drawPaint);
                 gameCanvas.drawBitmap(popo, popoX, popoY, drawPaint);
-                gameCanvas.drawBitmap(taxi, taxiX, taxiY, drawPaint);
+                for (int i = 0; i < 3; i++){
+                    gameCanvas.drawBitmap(taxi, taxiX, currentTaxiY[i], drawPaint);
+                }
+
                 ourHolder.unlockCanvasAndPost(gameCanvas);
             }
         }
@@ -223,11 +230,24 @@ public class PlayActivity extends Activity {
                 popoY = 2960;
             }
 
-            if (taxiY < 3400){
-                taxiY += taxiSpeed;
-            } else {
-                taxiY = -500;
+            for (int i = 0; i < 3; i++){
+                if (currentTaxiY[i] < 3000){
+                    currentTaxiY[i] += taxiSpeed;
+                } else {
+                    if (taxiLapCounter % 2 == 0){
+                        currentTaxiY[i] = -800;
+                    } else if (taxiLapCounter % 3 == 0){
+                        currentTaxiY[i] = -1000;
+                    } else{
+                        currentTaxiY[i] = -500;
+                    }
+
+                    if (i == 0)
+                        taxiLapCounter++;
+
+                }
             }
+
         }
 
         private void detectCollisions(){
