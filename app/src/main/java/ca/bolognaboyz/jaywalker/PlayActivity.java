@@ -24,7 +24,7 @@ public class PlayActivity extends Activity {
     Paint rectPaint = new Paint();
     Paint labelPaint = new Paint();
 
-    Bitmap player, car, background;
+    Bitmap player, popo, taxi, background;
 
     // For getting display details like the number of pixels
     Display display;
@@ -40,6 +40,14 @@ public class PlayActivity extends Activity {
     float playerX = 0;
     float playerY = 1020;
 
+    //Starting position of first column of cars
+    float popoX = 150;
+    float popoY = 2960;
+
+    //Starting position of second column of cars
+    float taxiX = 550;
+    float taxiY = -500;
+
     //Where the player tapped
     float touchX;
     float touchY;
@@ -49,7 +57,7 @@ public class PlayActivity extends Activity {
     float currentY;
 
     //Speeds
-    int audiSpeed = 20;
+    int taxiSpeed = 20;
     int popoSpeed = 30;
     int ambulanceSpeed = 50;
 
@@ -89,6 +97,8 @@ public class PlayActivity extends Activity {
         setContentView(gv);
 
         player = BitmapFactory.decodeResource(getResources(), R.drawable.testplayer);
+        popo = BitmapFactory.decodeResource(getResources(), R.drawable.police);
+        taxi = BitmapFactory.decodeResource(getResources(), R.drawable.taxi);
         background = BitmapFactory.decodeResource(getResources(), R.drawable.streetimg);
     }
 
@@ -184,7 +194,8 @@ public class PlayActivity extends Activity {
                 gameCanvas.drawBitmap(background,0, 0, drawPaint);
 
                 gameCanvas.drawBitmap(player, playerX, playerY, drawPaint);
-                gameCanvas.drawBitmap(car, car);
+                gameCanvas.drawBitmap(popo, popoX, popoY, drawPaint);
+                gameCanvas.drawBitmap(taxi, taxiX, taxiY, drawPaint);
                 ourHolder.unlockCanvasAndPost(gameCanvas);
             }
         }
@@ -206,7 +217,17 @@ public class PlayActivity extends Activity {
         }
 
         private void updatePositions(){
+            if (popoY > - 500){
+                popoY -= popoSpeed;
+            } else {
+                popoY = 2960;
+            }
 
+            if (taxiY < 3400){
+                taxiY += taxiSpeed;
+            } else {
+                taxiY = -500;
+            }
         }
 
         private void detectCollisions(){
