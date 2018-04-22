@@ -2,6 +2,7 @@ package ca.bolognaboyz.jaywalker;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -304,7 +305,11 @@ public class PlayActivity extends Activity {
             playerX = 0;
             lives--;
             playerCol = 0;
-            
+            if (lives == 0){
+                Intent intent = new Intent(PlayActivity.this,GameOverActivity.class);
+                intent.putExtra("playerScore", score);
+                startActivity(intent);
+            }
         }
     }
 

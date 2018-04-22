@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-    <activity android:name=".MainMenu">
+        <activity android:name=".MainMenu">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".PlayActivity" />
-        <activity android:name=".InstructionsActivity"></activity>
+        <activity android:name=".InstructionsActivity" />
+        <activity android:name=".GameOverActivity"></activity>
     </application>
 
 </manifest>
