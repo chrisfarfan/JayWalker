@@ -78,6 +78,7 @@ public class PlayActivity extends Activity {
     long lastFrameTime;
 
     int score = 100;
+    int lives = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,11 +198,19 @@ public class PlayActivity extends Activity {
                 background = Bitmap.createScaledBitmap(background, gameCanvas.getWidth(), gameCanvas.getHeight(), true);
                 gameCanvas.drawBitmap(background,0, 0, drawPaint);
 
+
+
                 gameCanvas.drawBitmap(player, playerX, playerY, drawPaint);
                 gameCanvas.drawBitmap(popo, popoX, popoY, drawPaint);
                 for (int i = 0; i < 3; i++){
                     gameCanvas.drawBitmap(taxi, taxiX, currentTaxiY[i], drawPaint);
                 }
+
+                drawPaint.setColor(Color.argb(255, 0, 0, 0));
+                drawPaint.setTextSize(85);
+                gameCanvas.drawText("Score: " + score +
+                                "                                  Lives: " + lives,
+                        20, 100, drawPaint);
 
                 ourHolder.unlockCanvasAndPost(gameCanvas);
             }
@@ -251,6 +260,10 @@ public class PlayActivity extends Activity {
         }
 
         private void detectCollisions(){
+            if (playerX >= 1200){
+                score += 50;
+                playerX = 0;
+            }
 
         }
     }
