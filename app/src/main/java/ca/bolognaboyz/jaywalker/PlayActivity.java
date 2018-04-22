@@ -39,6 +39,7 @@ public class PlayActivity extends Activity {
     //Starting position of player
     float playerX = 0;
     float playerY = 1020;
+    int playerCol = 0;
 
     //Starting position of first column of cars
     float popoX = 150;
@@ -46,10 +47,11 @@ public class PlayActivity extends Activity {
 
     //Starting positions of second columns of cars
     float taxiX = 550;
-    float initialTaxiY[] = {0, 900, 2200};
-    float currentTaxiY[] ={2200, 900, -300};
+    float initialTaxiY[] = {0, 1300 , 1200};
+    float taxiY[] ={2200, 900, -300};
 
     int taxiLapCounter = 0;
+    int popoLapCounter = 0;
 
 
     //Where the player tapped
@@ -169,17 +171,24 @@ public class PlayActivity extends Activity {
 
             touchX = event.getRawX();
             touchY = event.getRawY();
-            if (touchY > bottomHalfScreen) {//Player moving left
-                if (touchX < endOfLeft) {
-                    if (playerX > 0)
-                        playerX = playerX - playerHMovement;
-                } else if (touchX > startOfRight){ //Right
-                    if (playerX < screenWidth - 240)
-                        playerX = playerX + playerHMovement;
-                } else if (touchY > lastQuarterScreen && playerY < screenHeight - 400){ //Down
-                    playerY = playerY + playerVMovement;
-                } else if (touchY < lastQuarterScreen && playerY > 0) { //Up
-                    playerY = playerY - playerVMovement;
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (touchY > bottomHalfScreen) {//Player moving left
+                    if (touchX < endOfLeft) {
+                        if (playerX > 0) {
+                            playerX = playerX - playerHMovement;
+                            playerCol--;
+                        }
+                    } else if (touchX > startOfRight) { //Right
+                        if (playerX < screenWidth - 240) {
+                            playerX = playerX + playerHMovement;
+                            playerCol++;
+                            detectCollisions();
+                        }
+                    } else if (touchY > lastQuarterScreen && playerY < screenHeight - 400) { //Down
+                        playerY = playerY + playerVMovement;
+                    } else if (touchY < lastQuarterScreen && playerY > 0) { //Up
+                        playerY = playerY - playerVMovement;
+                    }
                 }
             }
 
@@ -203,7 +212,7 @@ public class PlayActivity extends Activity {
                 gameCanvas.drawBitmap(player, playerX, playerY, drawPaint);
                 gameCanvas.drawBitmap(popo, popoX, popoY, drawPaint);
                 for (int i = 0; i < 3; i++){
-                    gameCanvas.drawBitmap(taxi, taxiX, currentTaxiY[i], drawPaint);
+                    gameCanvas.drawBitmap(taxi, taxiX, taxiY[i], drawPaint);
                 }
 
                 drawPaint.setColor(Color.argb(255, 0, 0, 0));
@@ -237,18 +246,25 @@ public class PlayActivity extends Activity {
                 popoY -= popoSpeed;
             } else {
                 popoY = 2960;
+                popoLapCounter++;
+                if (popoLapCounter % 7 == 0){
+                    popoSpeed = 80;
+                }else if (popoLapCounter % 3 == 0)
+                    popoSpeed = 50;
+                else
+                    popoSpeed = 30;
             }
 
             for (int i = 0; i < 3; i++){
-                if (currentTaxiY[i] < 3000){
-                    currentTaxiY[i] += taxiSpeed;
+                if (taxiY[i] < 3000){
+                    taxiY[i] += taxiSpeed;
                 } else {
-                    if (taxiLapCounter % 2 == 0){
-                        currentTaxiY[i] = -800;
+                    if (taxiLapCounter % 4 == 0){
+                        taxiY[i] = -800;
                     } else if (taxiLapCounter % 3 == 0){
-                        currentTaxiY[i] = -1000;
+                        taxiY[i] = -1000;
                     } else{
-                        currentTaxiY[i] = -500;
+                        taxiY[i] = -500;
                     }
 
                     if (i == 0)
@@ -260,11 +276,35 @@ public class PlayActivity extends Activity {
         }
 
         private void detectCollisions(){
-            if (playerX >= 1200){
+            if (playerCol == 3){
+                //add stuff for yellow dot detection
                 score += 50;
                 playerX = 0;
+                playerCol = 0;
+            } else{
+                if (playerCol == 2) {
+                    for (int i = 0; i < 3; i++){
+                        if (playerY > taxiY[i] && playerY < taxiY[i] + taxi.getHeight() - 50 ||
+                                playerY + player.getHeight()-200 >= taxiY[i] &&
+                                        playerY + player.getHeight()-200 < taxiY[i] + taxi.getHeight() - 50){
+                            playerDeath();
+                        }
+                    }
+                } else if (playerCol == 1){
+                    if (playerY > popoY && playerY < popoY + popo.getHeight() - 50 ||
+                            playerY + player.getHeight() -200 >= popoY &&
+                                    playerY + player.getHeight()-200 < popoY + popo.getHeight() - 50){
+                        playerDeath();
+                    }
+                }
             }
+        }
 
+        private void playerDeath(){
+            playerX = 0;
+            lives--;
+            playerCol = 0;
+            
         }
     }
 
