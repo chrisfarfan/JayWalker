@@ -1,6 +1,6 @@
 //File Name: PlayActivity
 //Authors: Christopher Farfan Centeno, Marco Giardina, Thong Pham, Esaac Ahn
-//Student Numbers: 
+//Student#: 101067074                , 101025550     , 101035471 , 100836038
 //Date Last Modified: April 22nd, 2018
 //Description: A simple Frogger inspired game where the player must dodge cars to get to the other
 //             side. Players have 3 lives and must attempt to get the highest score possible
@@ -42,6 +42,7 @@ public class PlayActivity extends Activity {
     int playerSplat = -1;
     int jumpSound = -1;
     int successSound = -1;
+    int cashBling = -1;
     MediaPlayer bgm;
 
     // For getting display details like the number of pixels
@@ -58,6 +59,7 @@ public class PlayActivity extends Activity {
     float playerX = 0;
     float playerY = 1020;
     int playerCol = 0;
+    int playerRow = 3;
 
     //Starting position of first column of cars
     float popoX = 150;
@@ -95,6 +97,8 @@ public class PlayActivity extends Activity {
     int score = 0;
     int lives = 3;
 
+    int cashRow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +121,7 @@ public class PlayActivity extends Activity {
         playerSplat = soundPool.load(this, R.raw.playersplat, 1);
         jumpSound = soundPool.load(this, R.raw.jumpsound, 1);
         successSound = soundPool.load(this, R.raw.success, 1);
+        cashBling = soundPool.load(this, R.raw.buckets, 1);
         bgm = MediaPlayer.create(this,R.raw.bgm);
         bgm.setLooping(true);
         bgm.start();
@@ -130,7 +135,7 @@ public class PlayActivity extends Activity {
         popo = BitmapFactory.decodeResource(getResources(), R.drawable.police);
         taxi = BitmapFactory.decodeResource(getResources(), R.drawable.taxi);
         background = BitmapFactory.decodeResource(getResources(), R.drawable.streetimg);
-        money = BitmapFactory.decodeResource(getResources(), R.drawable.audi);
+        money = BitmapFactory.decodeResource(getResources(), R.drawable.cashmoney);
 
     }
 
@@ -217,9 +222,11 @@ public class PlayActivity extends Activity {
                         }
                     } else if (touchY > lastQuarterScreen && playerY < screenHeight - 400) { //Down
                         playerY = playerY + playerVMovement;
+                        playerRow++;
                         soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
                     } else if (touchY < lastQuarterScreen && playerY > 0) { //Up
                         playerY = playerY - playerVMovement;
+                        playerRow--;
                         soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
                     }
                 }
@@ -253,6 +260,21 @@ public class PlayActivity extends Activity {
                 gameCanvas.drawText("Score: " + score +
                                 "                                  Lives: " + lives,
                         20, 100, drawPaint);
+
+                if (taxiLapCounter % 4 == 0){
+                    money = Bitmap.createScaledBitmap(money, gameCanvas.getWidth() / 8,
+                            gameCanvas.getHeight() / 8, true);
+                    if (taxiLapCounter % 3 == 0){
+                        gameCanvas.drawBitmap(money,1200,100 ,drawPaint);
+                        cashRow = 0;
+                    } else if (taxiLapCounter % 3 == 1){
+                        gameCanvas.drawBitmap(money,1200,1000 ,drawPaint);
+                        cashRow = 3;
+                    }else {
+                        gameCanvas.drawBitmap(money, 1200, 2000, drawPaint);
+                        cashRow = 6;
+                    }
+                }
 
                 ourHolder.unlockCanvasAndPost(gameCanvas);
             }
@@ -310,13 +332,15 @@ public class PlayActivity extends Activity {
         //Function that deals with player collision with cars and with reaching the end
         private void detectCollisions(){
             if (playerCol == 3){
-                soundPool.play(successSound,1.f,1.f,1, 0,1.f);
-                //add stuff for yellow dot detection
-                score += 50;
+                if (playerRow == cashRow){
+                    soundPool.play(cashBling, 1.f, 1.f, 1, 0, 1.f);
+                    score += 200;
+                }else {
+                    soundPool.play(successSound, 1.f, 1.f, 1, 0, 1.f);
+                    score += 50;
+                }
                 playerX = 0;
                 playerCol = 0;
-
-
             } else{
                 if (playerCol == 2) {
                     for (int i = 0; i < 3; i++){
@@ -347,6 +371,7 @@ public class PlayActivity extends Activity {
                 startActivity(intent);
             }
         }
+
     }
 
 

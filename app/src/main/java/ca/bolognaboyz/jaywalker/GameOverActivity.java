@@ -1,3 +1,9 @@
+//File Name: GameOver
+//Authors: Christopher Farfan Centeno, Marco Giardina, Thong Pham, Esaac Ahn
+//Student#: 101067074                , 101025550     , 101035471 , 100836038
+//Date Last Modified: April 22nd, 2018
+//Description: Game Over screen for the game, can either click play again to start the game over or
+//             a user can click on main menu to return to the main menu
 package ca.bolognaboyz.jaywalker;
 
 import android.app.Activity;
