@@ -71,7 +71,7 @@ public class PlayActivity extends Activity {
     int popoLightNum = 0;
 
     //Starting positions of second columns of cars
-    float taxiX = 550;
+    float taxiX = 520;
    // float initialTaxiY[] = {0, 1300 , 1200};
     float taxiY[] ={2200, 900, -300};
 
@@ -293,9 +293,8 @@ public class PlayActivity extends Activity {
                 //Draw the UI
                 drawPaint.setColor(Color.argb(255, 0, 0, 0));
                 drawPaint.setTextSize(85);
-                gameCanvas.drawText("Score: " + score +
-                                "                                  Lives: " + lives,
-                        20, 100, drawPaint);
+                gameCanvas.drawText("Score: " + score, 20, 100, drawPaint);
+                gameCanvas.drawText("Lives: " + lives, 1150, 100, drawPaint);
 
                 //Draw the bonus cash
                 if (!cashGrab) {
@@ -396,16 +395,16 @@ public class PlayActivity extends Activity {
             } else{
                 if (playerCol == 2) {
                     for (int i = 0; i < 3; i++){
-                        if (playerY > taxiY[i] && playerY < taxiY[i] + taxi.getHeight() - 50 ||
-                                playerY + playerUp.getHeight()-200 >= taxiY[i] &&
-                                        playerY + playerUp.getHeight()-200 < taxiY[i] + taxi.getHeight() - 50){
+                        if (playerY + 50 > taxiY[i] && playerY + 50 < taxiY[i] + taxi.getHeight()  ||
+                                playerY + playerUp.getHeight() -180 >= taxiY[i] &&
+                                        playerY + playerUp.getHeight() -180 < taxiY[i] + taxi.getHeight()){
                             playerDeath();
                         }
                     }
                 } else if (playerCol == 1){
-                    if (playerY > popoY && playerY < popoY + popo[0].getHeight() - 50 ||
-                            playerY + playerUp.getHeight() -200 >= popoY &&
-                                    playerY + playerUp.getHeight()-200 < popoY + popo[0].getHeight() - 50){
+                    if (playerY +50 > popoY && playerY +50 < popoY + popo[0].getHeight()  ||
+                            playerY + playerUp.getHeight() -180  >= popoY &&
+                                    playerY + playerUp.getHeight() -180 < popoY + popo[0].getHeight()){
                         playerDeath();
                     }
                 }
