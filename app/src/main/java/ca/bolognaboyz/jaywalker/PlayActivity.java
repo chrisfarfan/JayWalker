@@ -34,7 +34,8 @@ public class PlayActivity extends Activity {
     Canvas gameCanvas;
     Paint drawPaint = new Paint();
 
-    Bitmap playerUp, playerDown,playerLeft, playerRight, popo, taxi, background, money;
+    Bitmap playerUp, playerDown,playerLeft, playerRight, taxi, background, money;
+    Bitmap popo[] = new Bitmap[3];
 
     // Sound
     // Initialize sound variables
@@ -43,6 +44,7 @@ public class PlayActivity extends Activity {
     int jumpSound = -1;
     int successSound = -1;
     int cashBling = -1;
+    int siren = -1;
     MediaPlayer bgm;
 
     // For getting display details like the number of pixels
@@ -65,6 +67,8 @@ public class PlayActivity extends Activity {
     //Starting position of first column of cars
     float popoX = 150;
     float popoY = 2960;
+    boolean popoLights = false;
+    int popoLightNum = 0;
 
     //Starting positions of second columns of cars
     float taxiX = 550;
@@ -99,6 +103,7 @@ public class PlayActivity extends Activity {
     int lives = 3;
 
     int cashRow;
+    boolean cashGrab = false;
 
 
     @Override
@@ -123,6 +128,7 @@ public class PlayActivity extends Activity {
         jumpSound = soundPool.load(this, R.raw.jumpsound, 1);
         successSound = soundPool.load(this, R.raw.success, 1);
         cashBling = soundPool.load(this, R.raw.buckets, 1);
+        siren = soundPool.load(this, R.raw.siren, 1);
         bgm = MediaPlayer.create(this,R.raw.bgm);
         bgm.setLooping(true);
         bgm.start();
@@ -136,7 +142,9 @@ public class PlayActivity extends Activity {
         playerDown = BitmapFactory.decodeResource(getResources(), R.drawable.playerdown);
         playerLeft = BitmapFactory.decodeResource(getResources(), R.drawable.playerleft);
         playerRight = BitmapFactory.decodeResource(getResources(), R.drawable.playerright);
-        popo = BitmapFactory.decodeResource(getResources(), R.drawable.police);
+        popo[0] = BitmapFactory.decodeResource(getResources(), R.drawable.police1);
+        popo[1] = BitmapFactory.decodeResource(getResources(), R.drawable.police2);
+        popo[2] = BitmapFactory.decodeResource(getResources(), R.drawable.police3);
         taxi = BitmapFactory.decodeResource(getResources(), R.drawable.taxi);
         background = BitmapFactory.decodeResource(getResources(), R.drawable.streetimg);
         money = BitmapFactory.decodeResource(getResources(), R.drawable.cashmoney);
@@ -255,7 +263,7 @@ public class PlayActivity extends Activity {
                 background = Bitmap.createScaledBitmap(background, gameCanvas.getWidth(), gameCanvas.getHeight(), true);
                 gameCanvas.drawBitmap(background,0, 0, drawPaint);
 
-
+                //Draw player in correct direction
                 if (playerDirection == 'R') {
                     gameCanvas.drawBitmap(playerRight, playerX, playerY, drawPaint);
                 } else if (playerDirection == 'L') {
@@ -266,30 +274,44 @@ public class PlayActivity extends Activity {
                     gameCanvas.drawBitmap(playerDown, playerX, playerY, drawPaint);
                 }
 
+                //Draw the popo
+                if (popoLights) {
+                    gameCanvas.drawBitmap(popo[popoLightNum], popoX, popoY, drawPaint);
+                    if (popoLightNum == 2){
+                        popoLightNum = 0;
+                    }else
+                        popoLightNum++;
+                } else{
+                    gameCanvas.drawBitmap(popo[1], popoX, popoY, drawPaint);
+                }
 
-                gameCanvas.drawBitmap(popo, popoX, popoY, drawPaint);
+                //Draw the three taxis
                 for (int i = 0; i < 3; i++){
                     gameCanvas.drawBitmap(taxi, taxiX, taxiY[i], drawPaint);
                 }
 
+                //Draw the UI
                 drawPaint.setColor(Color.argb(255, 0, 0, 0));
                 drawPaint.setTextSize(85);
                 gameCanvas.drawText("Score: " + score +
                                 "                                  Lives: " + lives,
                         20, 100, drawPaint);
 
-                if (taxiLapCounter % 4 == 0){
-                    money = Bitmap.createScaledBitmap(money, gameCanvas.getWidth() / 8,
-                            gameCanvas.getHeight() / 8, true);
-                    if (taxiLapCounter % 3 == 0){
-                        gameCanvas.drawBitmap(money,1200,100 ,drawPaint);
-                        cashRow = 0;
-                    } else if (taxiLapCounter % 3 == 1){
-                        gameCanvas.drawBitmap(money,1200,1000 ,drawPaint);
-                        cashRow = 3;
-                    }else {
-                        gameCanvas.drawBitmap(money, 1200, 2000, drawPaint);
-                        cashRow = 6;
+                //Draw the bonus cash
+                if (!cashGrab) {
+                    if (taxiLapCounter % 4 == 0) {
+                        money = Bitmap.createScaledBitmap(money, gameCanvas.getWidth() / 8,
+                                gameCanvas.getHeight() / 8, true);
+                        if (taxiLapCounter % 3 == 0) {
+                            gameCanvas.drawBitmap(money, 1200, 100, drawPaint);
+                            cashRow = 0;
+                        } else if (taxiLapCounter % 3 == 1) {
+                            gameCanvas.drawBitmap(money, 1200, 1000, drawPaint);
+                            cashRow = 3;
+                        } else {
+                            gameCanvas.drawBitmap(money, 1200, 2000, drawPaint);
+                            cashRow = 6;
+                        }
                     }
                 }
 
@@ -322,10 +344,20 @@ public class PlayActivity extends Activity {
                 popoLapCounter++;
                 if (popoLapCounter % 7 == 0){
                     popoSpeed = 80;
-                }else if (popoLapCounter % 3 == 0)
+                    if (!popoLights)
+                        soundPool.play(siren,0.8f,0.8f,1, 0,1.f);
+                    popoLights = true;
+                }else if (popoLapCounter % 3 == 0) {
                     popoSpeed = 50;
-                else
+                    if (!popoLights)
+                        soundPool.play(siren,0.8f,0.8f,1, 0,1.f);
+                    popoLights = true;
+                }
+                else {
+                    soundPool.stop(siren);
                     popoSpeed = 30;
+                    popoLights = false;
+                }
             }
 
             for (int i = 0; i < 3; i++){
@@ -340,8 +372,10 @@ public class PlayActivity extends Activity {
                         taxiY[i] = -500;
                     }
 
-                    if (i == 0)
+                    if (i == 0){
                         taxiLapCounter++;
+                        cashGrab = false;
+                    }
                 }
             }
 
@@ -352,6 +386,7 @@ public class PlayActivity extends Activity {
                 if (playerRow == cashRow){
                     soundPool.play(cashBling, 1.f, 1.f, 1, 0, 1.f);
                     score += 200;
+                    cashGrab = true;
                 }else {
                     soundPool.play(successSound, 1.f, 1.f, 1, 0, 1.f);
                     score += 50;
@@ -368,9 +403,9 @@ public class PlayActivity extends Activity {
                         }
                     }
                 } else if (playerCol == 1){
-                    if (playerY > popoY && playerY < popoY + popo.getHeight() - 50 ||
+                    if (playerY > popoY && playerY < popoY + popo[0].getHeight() - 50 ||
                             playerY + playerUp.getHeight() -200 >= popoY &&
-                                    playerY + playerUp.getHeight()-200 < popoY + popo.getHeight() - 50){
+                                    playerY + playerUp.getHeight()-200 < popoY + popo[0].getHeight() - 50){
                         playerDeath();
                     }
                 }
