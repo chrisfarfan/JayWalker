@@ -1,3 +1,11 @@
+//File Name: PlayActivity
+//Authors: Christopher Farfan Centeno, Marco Giardina, Thong Pham, Esaac Ahn
+//Student Numbers: 
+//Date Last Modified: April 22nd, 2018
+//Description: A simple Frogger inspired game where the player must dodge cars to get to the other
+//             side. Players have 3 lives and must attempt to get the highest score possible
+//             by crossing safetly as well as picking up money.
+
 package ca.bolognaboyz.jaywalker;
 
 import android.app.Activity;
@@ -10,7 +18,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -22,10 +33,16 @@ public class PlayActivity extends Activity {
     GameView gv;
     Canvas gameCanvas;
     Paint drawPaint = new Paint();
-    Paint rectPaint = new Paint();
-    Paint labelPaint = new Paint();
 
-    Bitmap player, popo, taxi, background;
+    Bitmap player, popo, taxi, background, money;
+
+    // Sound
+    // Initialize sound variables
+    private SoundPool soundPool;
+    int playerSplat = -1;
+    int jumpSound = -1;
+    int successSound = -1;
+    MediaPlayer bgm;
 
     // For getting display details like the number of pixels
     Display display;
@@ -48,7 +65,7 @@ public class PlayActivity extends Activity {
 
     //Starting positions of second columns of cars
     float taxiX = 550;
-    float initialTaxiY[] = {0, 1300 , 1200};
+   // float initialTaxiY[] = {0, 1300 , 1200};
     float taxiY[] ={2200, 900, -300};
 
     int taxiLapCounter = 0;
@@ -60,28 +77,24 @@ public class PlayActivity extends Activity {
     float touchY;
 
     //Storing player current pos
-    float currentX;
-    float currentY;
+    //float currentX;
+    //float currentY;
 
     //Speeds
     int taxiSpeed = 20;
     int popoSpeed = 30;
-    int ambulanceSpeed = 50;
 
     //How far to move
     int playerVMovement = 340;
     int playerHMovement = 400;
 
-    //Collision rectangles
-    Rect playerRect;
-    Rect carRect;
-
     //Stats
     int fps;
     long lastFrameTime;
 
-    int score = 100;
+    int score = 0;
     int lives = 3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +110,17 @@ public class PlayActivity extends Activity {
         lastQuarterScreen = bottomHalfScreen + (bottomHalfScreen / 2);
         endOfLeft =  (screenWidth / 2) - (screenWidth / 5);
         startOfRight = (screenWidth / 2) + (screenWidth / 5);
-        //bottomHalfScreen = 1480;
-        //lastQuarterScreen = 2220;
+
+
+        // Sound code
+        soundPool = (new SoundPool.Builder()).setMaxStreams(2).build();
+        playerSplat = soundPool.load(this, R.raw.playersplat, 1);
+        jumpSound = soundPool.load(this, R.raw.jumpsound, 1);
+        successSound = soundPool.load(this, R.raw.success, 1);
+        bgm = MediaPlayer.create(this,R.raw.bgm);
+        bgm.setLooping(true);
+        bgm.start();
+
 
 
         gv = new GameView(this);
@@ -108,6 +130,8 @@ public class PlayActivity extends Activity {
         popo = BitmapFactory.decodeResource(getResources(), R.drawable.police);
         taxi = BitmapFactory.decodeResource(getResources(), R.drawable.taxi);
         background = BitmapFactory.decodeResource(getResources(), R.drawable.streetimg);
+        money = BitmapFactory.decodeResource(getResources(), R.drawable.audi);
+
     }
 
     @Override
@@ -125,6 +149,7 @@ public class PlayActivity extends Activity {
     protected void onPause() {
         super.onPause();
         gv.pause();
+        bgm.release();
     }
 
     @Override
@@ -168,6 +193,9 @@ public class PlayActivity extends Activity {
         }
 
 
+
+        //Function that figures out where the user touched the screen and then moves the player
+        //in that direction as well as playing a sound
         public boolean onTouchEvent(MotionEvent event){
 
             touchX = event.getRawX();
@@ -178,17 +206,21 @@ public class PlayActivity extends Activity {
                         if (playerX > 0) {
                             playerX = playerX - playerHMovement;
                             playerCol--;
+                            soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
                         }
                     } else if (touchX > startOfRight) { //Right
                         if (playerX < screenWidth - 240) {
                             playerX = playerX + playerHMovement;
                             playerCol++;
+                            soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
                             detectCollisions();
                         }
                     } else if (touchY > lastQuarterScreen && playerY < screenHeight - 400) { //Down
                         playerY = playerY + playerVMovement;
+                        soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
                     } else if (touchY < lastQuarterScreen && playerY > 0) { //Up
                         playerY = playerY - playerVMovement;
+                        soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
                     }
                 }
             }
@@ -196,7 +228,7 @@ public class PlayActivity extends Activity {
 
             return true;
         }
-
+        //Function that deals with drawing all the graphics on the screen
         protected void myDraw(){
 
             if (ourHolder.getSurface().isValid()){
@@ -226,6 +258,7 @@ public class PlayActivity extends Activity {
             }
         }
 
+        //Function that controls the FPS of the game
         private void controlFPS() {
             long timeThisFrame = (System.
                     currentTimeMillis() - lastFrameTime);
@@ -241,7 +274,7 @@ public class PlayActivity extends Activity {
                 }
             }
         }
-
+        //Function that controls the position of the cars on screen
         private void updatePositions(){
             if (popoY > - 500){
                 popoY -= popoSpeed;
@@ -270,18 +303,20 @@ public class PlayActivity extends Activity {
 
                     if (i == 0)
                         taxiLapCounter++;
-
                 }
             }
 
         }
-
+        //Function that deals with player collision with cars and with reaching the end
         private void detectCollisions(){
             if (playerCol == 3){
+                soundPool.play(successSound,1.f,1.f,1, 0,1.f);
                 //add stuff for yellow dot detection
                 score += 50;
                 playerX = 0;
                 playerCol = 0;
+
+
             } else{
                 if (playerCol == 2) {
                     for (int i = 0; i < 3; i++){
@@ -300,8 +335,9 @@ public class PlayActivity extends Activity {
                 }
             }
         }
-
+        //Function that handles what happens when a player hits a car
         private void playerDeath(){
+            soundPool.play(playerSplat,1.f,1.f,1,0,1.f);
             playerX = 0;
             lives--;
             playerCol = 0;

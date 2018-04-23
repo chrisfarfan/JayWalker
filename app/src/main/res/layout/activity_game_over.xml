@@ -4,26 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ca.bolognaboyz.jaywalker.GameOverActivity">
+    tools:context="ca.bolognaboyz.jaywalker.GameOverActivity"
+    android:background="@drawable/streetimg">
 
     <Button
         android:id="@+id/mainMenuBtn"
-        android:layout_width="160dp"
-        android:layout_height="98dp"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:onClick="mainMenuClick"
         android:text="Main Menu "
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.759" />
+        app:layout_constraintVertical_bias="0.8" />
 
     <Button
         android:id="@+id/playAgainBtn"
-        android:layout_width="170dp"
-        android:layout_height="97dp"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -32,21 +36,23 @@
         android:text="Play Again"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/mainMenuBtn"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.757" />
+        app:layout_constraintVertical_bias="0.8" />
 
     <TextView
         android:id="@+id/gameOverMsg"
-        android:layout_width="327dp"
-        android:layout_height="220dp"
+        android:layout_width="225dp"
+        android:layout_height="300dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:textAlignment="center"
+        android:textColor="@android:color/background_dark"
         android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
