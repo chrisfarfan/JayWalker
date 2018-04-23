@@ -34,7 +34,7 @@ public class PlayActivity extends Activity {
     Canvas gameCanvas;
     Paint drawPaint = new Paint();
 
-    Bitmap player, popo, taxi, background, money;
+    Bitmap playerUp, playerDown,playerLeft, playerRight, popo, taxi, background, money;
 
     // Sound
     // Initialize sound variables
@@ -60,6 +60,7 @@ public class PlayActivity extends Activity {
     float playerY = 1020;
     int playerCol = 0;
     int playerRow = 3;
+    char playerDirection = 'R';
 
     //Starting position of first column of cars
     float popoX = 150;
@@ -131,7 +132,10 @@ public class PlayActivity extends Activity {
         gv = new GameView(this);
         setContentView(gv);
 
-        player = BitmapFactory.decodeResource(getResources(), R.drawable.testplayer);
+        playerUp = BitmapFactory.decodeResource(getResources(), R.drawable.playerup);
+        playerDown = BitmapFactory.decodeResource(getResources(), R.drawable.playerdown);
+        playerLeft = BitmapFactory.decodeResource(getResources(), R.drawable.playerleft);
+        playerRight = BitmapFactory.decodeResource(getResources(), R.drawable.playerright);
         popo = BitmapFactory.decodeResource(getResources(), R.drawable.police);
         taxi = BitmapFactory.decodeResource(getResources(), R.drawable.taxi);
         background = BitmapFactory.decodeResource(getResources(), R.drawable.streetimg);
@@ -212,22 +216,26 @@ public class PlayActivity extends Activity {
                             playerX = playerX - playerHMovement;
                             playerCol--;
                             soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
+                            playerDirection = 'L';
                         }
                     } else if (touchX > startOfRight) { //Right
                         if (playerX < screenWidth - 240) {
                             playerX = playerX + playerHMovement;
                             playerCol++;
                             soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
+                            playerDirection = 'R';
                             detectCollisions();
                         }
                     } else if (touchY > lastQuarterScreen && playerY < screenHeight - 400) { //Down
                         playerY = playerY + playerVMovement;
                         playerRow++;
                         soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
+                        playerDirection = 'D';
                     } else if (touchY < lastQuarterScreen && playerY > 0) { //Up
                         playerY = playerY - playerVMovement;
                         playerRow--;
                         soundPool.play(jumpSound,1.f,1.f,1, 0,1.f);
+                        playerDirection = 'U';
                     }
                 }
             }
@@ -248,8 +256,17 @@ public class PlayActivity extends Activity {
                 gameCanvas.drawBitmap(background,0, 0, drawPaint);
 
 
+                if (playerDirection == 'R') {
+                    gameCanvas.drawBitmap(playerRight, playerX, playerY, drawPaint);
+                } else if (playerDirection == 'L') {
+                    gameCanvas.drawBitmap(playerLeft, playerX, playerY, drawPaint);
+                } else if (playerDirection == 'U'){
+                    gameCanvas.drawBitmap(playerUp, playerX, playerY, drawPaint);
+                }else if (playerDirection == 'D'){
+                    gameCanvas.drawBitmap(playerDown, playerX, playerY, drawPaint);
+                }
 
-                gameCanvas.drawBitmap(player, playerX, playerY, drawPaint);
+
                 gameCanvas.drawBitmap(popo, popoX, popoY, drawPaint);
                 for (int i = 0; i < 3; i++){
                     gameCanvas.drawBitmap(taxi, taxiX, taxiY[i], drawPaint);
@@ -345,15 +362,15 @@ public class PlayActivity extends Activity {
                 if (playerCol == 2) {
                     for (int i = 0; i < 3; i++){
                         if (playerY > taxiY[i] && playerY < taxiY[i] + taxi.getHeight() - 50 ||
-                                playerY + player.getHeight()-200 >= taxiY[i] &&
-                                        playerY + player.getHeight()-200 < taxiY[i] + taxi.getHeight() - 50){
+                                playerY + playerUp.getHeight()-200 >= taxiY[i] &&
+                                        playerY + playerUp.getHeight()-200 < taxiY[i] + taxi.getHeight() - 50){
                             playerDeath();
                         }
                     }
                 } else if (playerCol == 1){
                     if (playerY > popoY && playerY < popoY + popo.getHeight() - 50 ||
-                            playerY + player.getHeight() -200 >= popoY &&
-                                    playerY + player.getHeight()-200 < popoY + popo.getHeight() - 50){
+                            playerY + playerUp.getHeight() -200 >= popoY &&
+                                    playerY + playerUp.getHeight()-200 < popoY + popo.getHeight() - 50){
                         playerDeath();
                     }
                 }
